@@ -32,12 +32,12 @@ pipeline {
          steps {
             sshagent(['EC2_SSH_KEY']) {
                 sh """
-                    ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
-                    docker stop my-docker-app || true
-                    docker rm my-docker-app || true
-                    docker pull $DOCKER_IMAGE
+                    ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
+                    docker stop my-docker-app || true && \
+                    docker rm my-docker-app || true && \
+                    docker pull $DOCKER_IMAGE && \
                     docker run -d -p 5000:5000 --name my-docker-app $DOCKER_IMAGE
-                    EOF
+                   "
                  """
             }
          }
