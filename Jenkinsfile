@@ -20,7 +20,7 @@ pipeline {
                sh 'docker build -t $DOCKER_IMAGE .'
            }
        }
-      stage('Push to Docker Hub') {
+       stage('Push to Docker Hub') {
          steps {
              withDockerRegistry([credentialsId: 'DOCKER_HUB_CREDENTIALS', url: '']) {
                  sh 'docker push $DOCKER_IMAGE'
