@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'amirul135/my-docer-app'
+        DOCKER_IMAGE = 'amirul135/my-docker-app'
         EC2_HOST = '13.60.225.142'
         EC2_USER = 'ubuntu'
         SSH_PRIVATE_KEY = credentials('EC2_SSH_KEY')
