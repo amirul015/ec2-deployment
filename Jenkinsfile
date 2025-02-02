@@ -11,7 +11,7 @@ pipeline {
     stages {
        stage('Clone Repository') {
            steps {
-               git branch: 'main', url:https://github.com/amirul015/ec2-deployment.git'
+               git branch: 'main', url: 'https://github.com/amirul015/ec2-deployment.git'
                  }
        }
 
