@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
  
-@Library('SharedPipelines')_
- 
 pipeline {
  
     agent { label 'linux' }
