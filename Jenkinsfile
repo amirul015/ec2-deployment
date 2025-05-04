@@ -37,7 +37,7 @@ pipeline {
                     ]
                     for (target in targets) {
                         sh """
-                            sudo mkdir -p ${target}
+                            mkdir -p ${target}
                             cp -f ${zipFileName} ${target}/
                         """
                     }
