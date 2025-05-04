@@ -5,6 +5,7 @@ pipeline {
         APPLICATION_NAME = 'CDH'
         COMPONENT_NAME = 'TestAutomation'
         TARGET_ENVIRONMENT = 'BAUDIT'
+        ZIP_FILE = "${APPLICATION_NAME}.${COMPONENT_NAME}.zip"
     }
     options {
         timeout(time: 1, unit: 'HOURS')
@@ -20,28 +21,31 @@ pipeline {
         stage('Build Zip') {
             steps {
                 script {
-                    def zipFileName = "${env.APPLICATION_NAME}.${env.COMPONENT_NAME}.zip"
-                    sh """
-                        zip -r ${zipFileName} . -x "*.git*" "*.zip"
-                    """
+                    sh '''
+                        echo "Current directory: $(pwd)"
+                        echo "Running as: $(whoami)"
+                        zip -r ${ZIP_FILE} . -x "*.git*" "*.zip"
+                        ls -l ${ZIP_FILE}
+                    '''
                 }
             }
         }
         stage('Distribute Zip') {
             steps {
                 script {
-                    def zipFileName = "${env.APPLICATION_NAME}.${env.COMPONENT_NAME}.zip"
                     def targets = [
                         '/mnt/storage/automation-zips/location1',
                         '/mnt/storage/automation-zips/location2'
                     ]
                     for (target in targets) {
                         sh """
-                            mkdir -p ${target}
-                            cp -rf ${zipFileName} ${target}/
+                            echo "Creating target dir: ${target}"
+                            sudo mkdir -p ${target}
+                            sudo chown jenkins:jenkins ${target}
+                            sudo cp -rf ${ZIP_FILE} ${target}/
                         """
                     }
-                    echo "Zip file ${zipFileName} copied to all targets successfully."
+                    echo "Zip file ${env.ZIP_FILE} copied to all targets successfully."
                 }
             }
         }
