@@ -38,7 +38,7 @@ pipeline {
                     for (target in targets) {
                         sh """
                             mkdir -p ${target}
-                            cp -f ${zipFileName} ${target}/
+                            cp -rf ${zipFileName} ${target}/
                         """
                     }
                     echo "Zip file ${zipFileName} copied to all targets successfully."
