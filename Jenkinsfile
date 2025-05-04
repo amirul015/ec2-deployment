@@ -2,7 +2,7 @@
  
 pipeline {
  
-    agent { label 'linux' }
+    agent { label 'local' }
  
     environment {
         APPLICATION_NAME = 'CDH'
