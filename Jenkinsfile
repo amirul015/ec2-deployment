@@ -1,64 +1,56 @@
 #!/usr/bin/env groovy
- 
 pipeline {
- 
     agent { label 'local' }
- 
     environment {
         APPLICATION_NAME = 'CDH'
         COMPONENT_NAME = 'TestAutomation'
         TARGET_ENVIRONMENT = 'BAUDIT'
     }
- 
     options {
         timeout(time: 1, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '5'))
-        skipDefaultCheckout()
         disableConcurrentBuilds()
     }
- 
     stages {
- 
-        stage('Build') {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build Zip') {
             steps {
                 script {
-                    def zipFileName = "${env.APPLICATION_NAME}_${env.COMPONENT_NAME}.zip"
+                    def zipFileName = "${env.APPLICATION_NAME}.${env.COMPONENT_NAME}.zip"
                     sh """
-                        mkdir -p TestAutomation
-                        zip -r TestAutomation/${zipFileName} . -x "*.git*" -x "TestAutomation/*"
-
+                        zip -r ${zipFileName} . -x "*.git*" "*.zip"
                     """
                 }
             }
         }
- 
         stage('Distribute Zip') {
             steps {
                 script {
-                    def zipFileName = "${env.APPLICATION_NAME}_${env.COMPONENT_NAME}.zip"
-                    def sourcePath = "TestAutomation/${zipFileName}"
- 
+                    def zipFileName = "${env.APPLICATION_NAME}.${env.COMPONENT_NAME}.zip"
                     def targets = [
                         '/mnt/storage/automation-zips/location1',
                         '/mnt/storage/automation-zips/location2'
                     ]
- 
                     for (target in targets) {
                         sh """
                             mkdir -p ${target}
-                            cp -f ${sourcePath} ${target}/${zipFileName}
+                            cp -f ${zipFileName} ${target}/
                         """
                     }
- 
-                    echo "Zip file copied to all targets successfully."
+                    echo "Zip file ${zipFileName} copied to all targets successfully."
                 }
             }
         }
- 
         stage('Tag') {
             when {
-                beforeAgent true
-                anyOf { branch 'develop'; branch 'release/*' }
+                anyOf {
+                    branch 'develop'
+                    branch pattern: 'release/.*', comparator: 'REGEXP'
+                }
                 expression { return (env.BUILD_TYPE == 'CICD') }
             }
             steps {
@@ -68,13 +60,9 @@ pipeline {
             }
         }
     }
- 
     post {
         always {
-            script {
-                echo 'cleaning workspace!!!'
-                // deleteDir()
-            }
+            cleanWs()
         }
     }
 }
