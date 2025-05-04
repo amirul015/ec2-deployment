@@ -26,7 +26,7 @@ pipeline {
                     sh """
                         mkdir -p TestAutomation
                         zip -r TestAutomation/${zipFileName} . -x "*.git*" -x "TestAutomation/*"
-                        find . -mindepth 1 ! -name "TestAutomation" -exec rm -rf {} +
+
                     """
                 }
             }
