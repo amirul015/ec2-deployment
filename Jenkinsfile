@@ -8,8 +8,6 @@ pipeline {
         APPLICATION_NAME = 'CDH'
         COMPONENT_NAME = 'TestAutomation'
         TARGET_ENVIRONMENT = 'BAUDIT'
-        TOOL_PYTHON = 'Python_3.11'
-        PYTHON_HOME = tool name: 'Python_3.11', type: 'jenkins.plugins.shiningpanda.tools.PythonInstallation'
     }
  
     options {
