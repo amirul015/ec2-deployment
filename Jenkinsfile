@@ -1,23 +1,30 @@
 #!/usr/bin/env groovy
+ 
 pipeline {
+ 
     agent { label 'local' }
+ 
     environment {
         APPLICATION_NAME = 'CDH'
         COMPONENT_NAME = 'TestAutomation'
         TARGET_ENVIRONMENT = 'BAUDIT'
         ZIP_FILE = "${APPLICATION_NAME}.${COMPONENT_NAME}.zip"
     }
+ 
     options {
         timeout(time: 1, unit: 'HOURS')
         buildDiscarder(logRotator(numToKeepStr: '5'))
         disableConcurrentBuilds()
     }
+ 
     stages {
+ 
         stage('Checkout Code') {
             steps {
                 checkout scm
             }
         }
+ 
         stage('Build Zip') {
             steps {
                 script {
@@ -30,6 +37,7 @@ pipeline {
                 }
             }
         }
+ 
         stage('Distribute Zip') {
             steps {
                 script {
@@ -37,6 +45,7 @@ pipeline {
                         '/mnt/storage/automation-zips/location1',
                         '/mnt/storage/automation-zips/location2'
                     ]
+ 
                     for (target in targets) {
                         sh """
                             echo "Creating target dir: ${target}"
@@ -45,10 +54,18 @@ pipeline {
                             sudo cp -rf ${ZIP_FILE} ${target}/
                         """
                     }
+ 
                     echo "Zip file ${env.ZIP_FILE} copied to all targets successfully."
                 }
             }
         }
+ 
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: "${env.ZIP_FILE}", fingerprint: true
+            }
+        }
+ 
         stage('Tag') {
             when {
                 anyOf {
@@ -63,10 +80,12 @@ pipeline {
                 }
             }
         }
+ 
     }
+ 
     post {
         always {
-            cleanWs()
+            cleanWs() // Workspace will be cleaned AFTER artifacts are archived
         }
     }
 }
