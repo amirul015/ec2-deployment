@@ -85,7 +85,7 @@ pipeline {
  
     post {
         always {
-          //  cleanWs() // Workspace will be cleaned AFTER artifacts are archived
+          // cleanWs()
         }
     }
 }
